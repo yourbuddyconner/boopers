@@ -13,23 +13,34 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String    @unique
-  password  String
-  lastLogin DateTime?
-  boopers   Booper[]
-  boops     Boop[]
+  id            Int       @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  email         String    @unique
+  password      String
+  lastLogin     DateTime?
+  role          UserRole  @default(PATRON)
+  totalPoints   Int       @default(0)
+  level         Int       @default(1)
+  boopers       Booper[]
+  boops         Boop[]
+  achievements  UserAchievement[]
+  rewards       UserReward[]
+  events        UserEvent[]
 }
 
 model Booper {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String?
   userId      Int
-  user        User    @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  pointValue  Int       @default(1)
+  location    String?
+  isActive    Boolean   @default(true)
   boops       Boop[]
+  events      Event[]   @relation("EventBoopers")
+  content     Content?
 }
 
 model Boop {
@@ -40,4 +51,87 @@ model Boop {
   booper    Booper   @relation(fields: [booperId], references: [id])
   timestamp DateTime @default(now())
   location  String?
+  eventId   Int?
+  event     Event?   @relation(fields: [eventId], references: [id])
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  boopers     Booper[]  @relation("EventBoopers")
+  boops       Boop[]
+  users       UserEvent[]
+}
+
+model Achievement {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  users       UserAchievement[]
+}
+
+model Reward {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  pointCost   Int
+  users       UserReward[]
+}
+
+model Content {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  contentType ContentType
+  data        String
+  booperId    Int       @unique
+  booper      Booper    @relation(fields: [booperId], references: [id])
+}
+
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id])
+  achievementId Int
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  achievedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model UserReward {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  rewardId  Int
+  reward    Reward   @relation(fields: [rewardId], references: [id])
+  redeemedAt DateTime @default(now())
+}
+
+model UserEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  joinedAt  DateTime @default(now())
+
+  @@unique([userId, eventId])
+}
+
+enum UserRole {
+  ADMIN
+  EVENT_OWNER
+  PATRON
+}
+
+enum ContentType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  URL
 }
