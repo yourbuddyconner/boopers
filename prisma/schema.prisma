@@ -1,0 +1,43 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "binary"
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String    @unique
+  password  String
+  lastLogin DateTime?
+  boopers   Booper[]
+  boops     Boop[]
+}
+
+model Booper {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  userId      Int
+  user        User    @relation(fields: [userId], references: [id])
+  boops       Boop[]
+}
+
+model Boop {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  booperId  Int
+  booper    Booper   @relation(fields: [booperId], references: [id])
+  timestamp DateTime @default(now())
+  location  String?
+}

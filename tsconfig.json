@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "target": "ES2021",
+      "moduleResolution": "node",
+      "module": "CommonJS",
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "allowSyntheticDefaultImports": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "declaration": true,
+      "outDir": "dist",
+      "rootDir": "src",
+      "lib": ["es2021", "esnext.asynciterable", "dom"],
+      "sourceMap": true,
+      "inlineSources": true,
+      "skipLibCheck": true,
+      // Set `sourceRoot` to  "/" to strip the build path prefix
+      // from generated source code references.
+      // This improves issue grouping in Sentry.
+      "sourceRoot": "/",
+    },
+    "include": ["src/**/*.json", "src/**/*.ts"],
+}
